@@ -1,0 +1,24 @@
+[fetch]
+prioritize_origin = true
+mirrors = [
+  "https://releases.unikraft.org/mirrors",
+]
+
+[configure]
+platform = "kvm"
+architecture = "x86_64"
+
+[list]
+origins = [
+  "http://github.com/AlexPaWe/unikraft.git",
+  "http://github.com/unikraft/plat-*",
+  "http://github.com/AlexPaWe/lib-tlsf.git",
+  "http://github.com/AlexPaWe/lib-tinyalloc.git",
+  "http://github.com/AlexPaWe/lib-mimalloc.git",
+  "http://github.com/AlexPaWe/lib-lwip.git",
+  "http://github.com/unikraft/lib-pthread-embedded.git",
+  "http://github.com/unikraft/lib-newlib.git",
+  "http://github.com/unikraft/lib-nginx.git",
+  "http://github.com/AlexPaWe/app-helloworld.git",
+  "http://github.com/AlexPaWe/app-nginx.git",
+]
