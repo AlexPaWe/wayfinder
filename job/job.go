@@ -337,6 +337,15 @@ func paramPermutations(param *JobParam) ([]TaskParam, error) {
   )
 }
 
+func (j *Job) isInArray(param JobParam) (bool) {
+  for _, par := range j.Params {
+    if par.Name == param.Name {
+      return true
+    }
+  }
+  return false
+}
+
 // nextTask recursively iterates across paramters to generate a set of tasks
 func (j *Job) nextTask(i int, tasks []*Task, curr []TaskParam) ([]*Task, error) {
   // List all permutations for this parameter
@@ -346,11 +355,14 @@ func (j *Job) nextTask(i int, tasks []*Task, curr []TaskParam) ([]*Task, error) 
   }
 
   // If the current parameter has subparameters, add them to the jobs parameter list
+  // TODO: Check if they are already in the list!
   if len(j.Params[i].Params) > 0 {
     for _, subParam := range j.Params[i].Params {
-      j.Params = append(j.Params, JobParam{}) // Make space for new element
-      copy(j.Params[(i+2):], j.Params[(i+1):]) // Shift elements
-      j.Params[i+1] = subParam // Insert the new sub parameter
+      if !j.isInArray(subParam) {
+        j.Params = append(j.Params, JobParam{}) // Make space for new element
+        copy(j.Params[(i+2):], j.Params[(i+1):]) // Shift elements
+        j.Params[i+1] = subParam // Insert the new sub parameter
+      }
     }
   }
 
@@ -365,7 +377,7 @@ func (j *Job) nextTask(i int, tasks []*Task, curr []TaskParam) ([]*Task, error) 
     // Check if when-condition of a subparameter is met
     if len(j.Params[i].When) > 0 {
 
-      //print("Param is " + j.Params[i].Name + "; Comp is " + j.Params[i].Comp + "; When is " + j.Params[i].When + "\n")
+      print("Current param is " + j.Params[i].Name + "; Comp is " + j.Params[i].Comp + "; When is " + j.Params[i].When + "\n")
       if j.Params[i].When == j.Params[i].Comp {
 	    curr = append(curr, param)
       }
@@ -375,13 +387,13 @@ func (j *Job) nextTask(i int, tasks []*Task, curr []TaskParam) ([]*Task, error) 
 
     // Remember value for each of the parameters subparameters
     if len(j.Params[i].Params) > 0 {
-	    /*print(j.Params[i].Name + " has subparameters:\n")
+	    print(j.Params[i].Name + " has subparameters:\n")
 	    for _, subParam := range j.Params[i].Params {
 	      print(subParam.Name + "\n")
-	    }*/
+	    }
       for k, _ := range j.Params[i].Params {
 	      j.Params[1+i+k].Comp = param.Value
-	      //print("Subparameter " + j.Params[1+i+k].Name + " has Comp " + j.Params[i+k].Comp + "\n")
+	      print("Subparameter " + j.Params[1+i+k].Name + " has Comp " + j.Params[1+i+k].Comp + "\n")
       }
     }
 
@@ -396,6 +408,7 @@ func (j *Job) nextTask(i int, tasks []*Task, curr []TaskParam) ([]*Task, error) 
         Params:   p,
       }
       tasks = append(tasks, task)
+      print("Task building completed\n___________________________________________")
 
     // Otherwise, recursively parse parameters in-order    
     } else {
