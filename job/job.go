@@ -365,6 +365,7 @@ func (j *Job) nextTask(i int, tasks []*Task, curr []TaskParam) ([]*Task, error) 
     // Check if when-condition of a subparameter is met
     if len(j.Params[i].When) > 0 {
 
+      //print("Param is " + j.Params[i].Name + "; Comp is " + j.Params[i].Comp + "; When is " + j.Params[i].When + "\n")
       if j.Params[i].When == j.Params[i].Comp {
 	    curr = append(curr, param)
       }
@@ -373,8 +374,15 @@ func (j *Job) nextTask(i int, tasks []*Task, curr []TaskParam) ([]*Task, error) 
     }
 
     // Remember value for each of the parameters subparameters
-    for _, subParam := range j.Params[i].Params {
-      subParam.Comp = param.Value
+    if len(j.Params[i].Params) > 0 {
+	    /*print(j.Params[i].Name + " has subparameters:\n")
+	    for _, subParam := range j.Params[i].Params {
+	      print(subParam.Name + "\n")
+	    }*/
+      for k, _ := range j.Params[i].Params {
+	      j.Params[1+i+k].Comp = param.Value
+	      //print("Subparameter " + j.Params[1+i+k].Name + " has Comp " + j.Params[i+k].Comp + "\n")
+      }
     }
 
     // Break when there are no more parameters to iterate over, thus creating
