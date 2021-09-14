@@ -391,10 +391,17 @@ func (j *Job) nextTask(i int, tasks []*Task, curr []TaskParam) ([]*Task, error) 
 	    for _, subParam := range j.Params[i].Params {
 	      print(subParam.Name + "\n")
 	    }
-      for k, _ := range j.Params[i].Params {
+      for _, subParam := range j.Params[i].Params {
+	for c := 0; c < len(j.Params); c++ {
+	  if subParam.Name == j.Params[c].Name {
+            j.Params[c].Comp = param.Value
+          }
+	}
+      }
+      /*for k, _ := range j.Params[i].Params {
 	      j.Params[1+i+k].Comp = param.Value
 	      print("Subparameter " + j.Params[1+i+k].Name + " has Comp " + j.Params[1+i+k].Comp + "\n")
-      }
+      }*/
     }
 
     // Break when there are no more parameters to iterate over, thus creating
