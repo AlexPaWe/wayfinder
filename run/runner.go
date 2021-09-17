@@ -35,6 +35,7 @@ import (
   "fmt"
   "time"
   "path"
+  "regexp"
   "strings"
 
   "golang.org/x/sys/unix"
@@ -494,6 +495,24 @@ func (r *Runner) Run() (int, time.Duration, error) {
   state, err := taskProcess.Wait()
   if err != nil {
     return 1, -1, fmt.Errorf("Could not wait for container to finish: %s", err)
+  }
+
+  //Check if the run was successfull and if so if it was a run job. If yes, delete kernel files
+  exitCode := state.ExitCode()
+  if exitCode == 0 {
+    for _, output := range *r.out {
+      runbool, _ := regexp.MatchString(`run`, r.Config.Name)
+      usrbool, _ := regexp.MatchString(`usr`, output.Path)
+      if runbool && usrbool {
+        r.log.Debugf("Deleting result: %s", output.Path)
+        err := os.Remove(
+          path.Join(r.Config.ResultsDir, output.Path),
+        )
+        if err != nil {
+          r.log.Warnf("Could not delete result: %s", err)
+        }
+      }
+    }
   }
 
   return state.ExitCode(), time.Since(r.timer), nil
