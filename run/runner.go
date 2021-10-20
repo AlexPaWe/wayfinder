@@ -192,8 +192,12 @@ func (r *Runner) Init(in *[]Input, out *[]Output, dryRun bool) error {
       path.Join(r.Config.ResultsDir, output.Path),
       path.Join(r.rootfs, output.Path),
     )
+    rmerr := os.Remove(path.Join(r.Config.ResultsDir, output.Path))
     if err != nil {
       r.log.Warnf("Could not copy result: %s", err)
+    }
+    if rmerr != nil {
+      r.log.Warnf("Could not delete result: %s", rmerr)
     }
   }
 
@@ -505,9 +509,7 @@ func (r *Runner) Run() (int, time.Duration, error) {
       usrbool, _ := regexp.MatchString(`usr`, output.Path)
       if runbool && usrbool {
         r.log.Debugf("Deleting result: %s", output.Path)
-        err := os.Remove(
-          path.Join(r.Config.ResultsDir, output.Path),
-        )
+        err := os.Remove(path.Join(r.rootfs, output.Path))
         if err != nil {
           r.log.Warnf("Could not delete result: %s", err)
         }
