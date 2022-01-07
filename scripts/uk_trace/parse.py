@@ -94,7 +94,7 @@ class sample_parser:
         except EndOfBuffer:
             raise StopIteration
 
-        magic = magic.decode()
+        magic = magic.decode('latin-1')
         if (magic != TP_HEADER_MAGIC):
             raise StopIteration
 
